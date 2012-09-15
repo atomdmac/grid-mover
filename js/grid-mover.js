@@ -70,12 +70,50 @@ Crafty.c("GridMover", {
 			
 			// Go ahead and move 'er!
 			this.tween(animProps, this._moveDuration);
+			
+			// Let everyone know that we've moved 'er!
+			var currentCell = this._toCell({
+				x: this._x,
+				y: this._y
+			});
+			var destinationCell = this._toCell({
+				x: animProps.x != undefined ? animProps.x : this._x,
+				y: animProps.y != undefined ? animProps.y : this._y
+			});
+			var event = {
+				target: this,
+				current: currentCell,
+				destination: destinationCell
+			};
+			
+			this.trigger("ChangeCellStart", event);
+		}
+	},
+	
+	// Convert a position to a tile/cell.
+	_toCell: function (pos) {
+		return {
+			x: Math.floor(pos.x / this._gridSize),
+			y: Math.floor(pos.y / this._gridSize)
 		}
 	},
 	
 	// Fire when I've moved 1 whole tile.
 	_onTileArrive: function (e) {
 		this._isMoving = false;
+		
+		// Tell everyone about it!
+		var currentPos = this._toCell({
+			x: this._x,
+			y: this._y
+		});
+		var event = {
+			target: this,
+			current: currentPos
+		}
+		this.trigger("ChangeCellEnd", event);
+		
+		// Keep moving?
 		if (this._curKey != null) {
 			this._move();
 		}
@@ -84,8 +122,8 @@ Crafty.c("GridMover", {
 	// Initialize with arguments.
 	gridMover: function (size, moveDuration) {
 		this.attr({
-			x: size,
-			y: size
+			w: size,
+			h: size
 		});
 		this._gridSize = size;
 		this._moveDuration = moveDuration;

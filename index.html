@@ -7,25 +7,30 @@
 	<script src="../js/crafty.js"></script>
 	<script src="js/grid-display.js"></script>
 	<script src="js/grid-mover.js"></script>
+	<script src="js/player.js"></script>
 	
 	<script>
 	$().ready( function (e) {
+	
+		// Config
+		var config = {
+			tileSize: 50
+		}
 		
+		// Engine init.
 		Crafty.init(500, 500);
 		
 		// Create the grid.
-		Crafty.e("GridDisplay").gridDisplay(50, 50);
+		Crafty.e("GridDisplay").gridDisplay(config.tileSize, config.tileSize);
 		
 		// Create the local player.
-		var localPlayer = Crafty.e("2D, DOM, Color, GridMover")
+		var localPlayer = Crafty.e("2D, DOM, Color, GridMover, Player")
 			.color("#00FF00")
 			.attr({
-				x: 50,
-				y: 50,
-				w: 50,
-				h: 50
+				x: config.tileSize,
+				y: config.tileSize
 			})
-			.gridMover(50, 10);
+			.gridMover(config.tileSize, 10);
 		
 	});
 	</script>
