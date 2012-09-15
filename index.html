@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Grid Mover</title>
+	
+	<script src="../js/jquery.js"></script>
+	<script src="../js/crafty.js"></script>
+	<script src="js/grid-display.js"></script>
+	<script src="js/grid-mover.js"></script>
+	
+	<script>
+	$().ready( function (e) {
+		
+		Crafty.init(500, 500);
+		
+		// Create the grid.
+		Crafty.e("GridDisplay").gridDisplay(50, 50);
+		
+		// Create the local player.
+		var localPlayer = Crafty.e("2D, DOM, Color, GridMover")
+			.color("#00FF00")
+			.attr({
+				x: 50,
+				y: 50,
+				w: 50,
+				h: 50
+			})
+			.gridMover(50, 10);
+		
+	});
+	</script>
+</head>
+<body>
+ 
+</body>
+</html>
