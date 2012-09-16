@@ -3,6 +3,9 @@
 // ----------------------------------------------------------------- //
 Crafty.c("GridMover", {
 	
+	// A unique ID for this entity.
+	id: null,
+	
 	// If a key is pressed, remember which one.
 	_curKey: null,
 	
@@ -141,6 +144,9 @@ Crafty.c("GridMover", {
 		this.bind("TweenEnd", function (e) {
 			self._onTileArrive.call(self, e) 
 		});
+		
+		// For chaining.
+		return this;
 	},
 	
 	// Pre-init stuff.
