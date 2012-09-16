@@ -40,7 +40,7 @@
 				y: config.tileSize
 			})
 			.gridMover(config.tileSize, 10)
-			.localPlayer("#FF00FF", websocket);
+			.localMover("#FF00FF", websocket);
 			
 		// Keep the server updated with regards to localPlayer.
 		websocket.add(localPlayer);

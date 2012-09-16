@@ -6,9 +6,6 @@ Crafty.c("GridMover", {
 	// A unique ID for this entity.
 	id: null,
 	
-	// If a key is pressed, remember which one.
-	_curKey: null,
-	
 	// The assumed size of each tile.  Affects how far our minimum 
 	// movement distance is.
 	_gridSize: 50,
@@ -19,20 +16,8 @@ Crafty.c("GridMover", {
 	// Are we moving between tiles currently?
 	_isMoving: false,
 	
-	// Fire when a key is pressed.
-	_keyDown: function (e) {
-		if (this._curKey == null) {
-			this._curKey = e.key;
-			this._move();
-		}
-	},
-	
-	// Fire when a key is released.
-	_keyUp: function (e) {
-		if (this._curKey == e.key) {
-			this._curKey = null;
-		}
-	},
+	// Current direction that we're moving.
+	_direction: null,
 	
 	// Move me!
 	_move: function () {
@@ -47,28 +32,30 @@ Crafty.c("GridMover", {
 			// !!! DEBUG !!! //
 			console.log("Trying to move using key: ", this._curKey);
 			
-			if (this._curKey == Crafty.keys["LEFT_ARROW"]) {
-				animProps = {
-					x: this._x - this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["RIGHT_ARROW"]) {
-				animProps = {
-					x: this._x + this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["UP_ARROW"]) {
-				animProps = {
-					y: this._y - this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["DOWN_ARROW"]) {
-				animProps = {
-					y: this._y + this._gridSize
-				};
+			// Which direction to move?
+			switch (this._direction) {
+				case "LEFT":
+					animProps = {
+						x: this._x - this._gridSize
+					};
+					break;
+				case "RIGHT":
+					animProps = {
+						x: this._x + this._gridSize
+					};
+					break;
+				case "UP":
+					animProps = {
+						y: this._y - this._gridSize
+					};
+					break;
+				case "DOWN":
+					animProps = {
+						y: this._y + this._gridSize
+					};
+					break;
+				default:
+					break;
 			}
 			
 			// Go ahead and move 'er!
@@ -86,7 +73,8 @@ Crafty.c("GridMover", {
 			var event = {
 				target: this,
 				current: currentCell,
-				destination: destinationCell
+				destination: destinationCell,
+				direction: this._direction
 			};
 			
 			this.trigger("ChangeCellStart", event);
@@ -117,8 +105,8 @@ Crafty.c("GridMover", {
 		this.trigger("ChangeCellEnd", event);
 		
 		// Keep moving?
-		if (this._curKey != null) {
-			this._move();
+		if (this._direction != null) {
+			this._move(this._direction);
 		}
 	},
 	
@@ -135,12 +123,6 @@ Crafty.c("GridMover", {
 		var self = this;
 		
 		// Assign event handlers.
-		this.bind("KeyDown", function (e) { 
-			self._keyDown.call(self, e) 
-		});
-		this.bind("KeyUp", function (e) { 
-			self._keyUp.call(self, e) 
-		});
 		this.bind("TweenEnd", function (e) {
 			self._onTileArrive.call(self, e) 
 		});
