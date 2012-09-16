@@ -20,7 +20,7 @@ Crafty.c("GridMover", {
 	_direction: null,
 	
 	// Move me!
-	_move: function () {
+	_move: function (bUseEvent) {
 		
 		if (!this._isMoving) {
 			// Well, we're going to move now.
@@ -77,7 +77,10 @@ Crafty.c("GridMover", {
 				direction: this._direction
 			};
 			
-			this.trigger("ChangeCellStart", event);
+			// Dispatch an event (if necessary).
+			if (bUseEvent) {
+				this.trigger("ChangeCellStart", event);
+			}
 		}
 	},
 	
@@ -86,6 +89,14 @@ Crafty.c("GridMover", {
 		return {
 			x: Math.floor(pos.x / this._gridSize),
 			y: Math.floor(pos.y / this._gridSize)
+		}
+	},
+	
+	// Convert a tile/cell position to screen coords.
+	_toCoords: function (pos) {
+		return {
+			x: pos.x * this._gridSize,
+			y: pos.y * this._gridSize
 		}
 	},
 	

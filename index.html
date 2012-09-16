@@ -5,11 +5,13 @@
 	
 	<script src="../js/jquery.js"></script>
 	<script src="../js/crafty.js"></script>
+	<script src="js/utils.js"></script>
 	<script src="js/events.js"></script>
 	<script src="js/grid-display.js"></script>
 	<script src="js/grid-mover.js"></script>
 	<script src="js/client.js"></script>
 	<script src="js/player.js"></script>
+	<script src="js/remote-player.js"></script>
 	
 	<script>
 	$().ready( function (e) {
@@ -32,15 +34,17 @@
 		// Create the grid.
 		Crafty.e("GridDisplay").gridDisplay(config.tileSize, config.tileSize);
 		
+		var newColor = Utils.getRandomColor();
+		console.log(newColor);
+		
 		// Create the local player.
-		var localPlayer = Crafty.e("2D, DOM, Color, GridMover, LocalMover")
-			.color("#00FF00")
+		var localPlayer = Crafty.e("2D, DOM, GridMover, LocalMover")
 			.attr({
 				x: config.tileSize,
 				y: config.tileSize
 			})
 			.gridMover(config.tileSize, 10)
-			.localMover("#FF00FF", websocket);
+			.localMover(newColor, websocket);
 			
 		// Keep the server updated with regards to localPlayer.
 		websocket.add(localPlayer);
