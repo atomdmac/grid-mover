@@ -12,20 +12,33 @@ var connections = [];
 wss.on('connection', function (ws) {
 	
 	// Tell new player about existing movable items.
-	var movers = [];
+	// Create a complete list of all movers from all connections.
+	var allMovers = [];
 	for (var i=0; i<connections.length; i++) {
-		movers = movers.concat(connections[i].movers);
+		
+		var moverList = connections[i].movers;
+		for (var item in moverList) {
+			allMovers.push(moverList[item]);
+		}
 	}
-	if (movers.length > 0) {
+	
+	// !!! DEBUG !!! //
+	console.log("Sending entire movers list: ", allMovers)
+	
+	// If there's at least one mover here, tell everyone about it.
+	if (allMovers.length > 0) {
 		var announceEvent = {
 			"type": "announce_movers",
-			"movers": movers,
+			"movers": allMovers,
 			"initial": "true"
 		};
 		ws.send(JSON.stringify(announceEvent));
 	}
-	console.log("Sending entire movers list: ", movers)
 	
+	// A place to store movers for this connection.
+	ws.movers = {};
+	
+	// When the server recieves a message from this connection...
     ws.on('message', function(message) {
         console.log('Received: %s', message);
 		
@@ -34,7 +47,17 @@ wss.on('connection', function (ws) {
 		
 		// Store movers list so we can update players that join later.
 		if (data.type == "announce_movers") {
-			ws.movers = data.movers;
+			for (var item in data.movers) {
+				var curMover = data.movers[item];
+				ws.movers[curMover.id] = data.movers[item];
+			}
+		}
+		
+		// Keep track of where movers are.
+		if (data.type == "movement") {
+			var moved = ws.movers[data.id];
+			moved.x = data.destination.x;
+			moved.y = data.destination.y;
 		}
 		
 		// Broadcast the message.

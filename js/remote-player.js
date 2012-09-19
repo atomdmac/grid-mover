@@ -70,9 +70,13 @@ Crafty.c("RemoteMover", {
 		console.log("Creating Remote Mover: ", data);
 	
 		this.id = data.id;
+		var pos = this._toCoords(data);
+		
+		console.log("POS = ", pos);
+		
 		this.attr({
-			x: data.x,
-			y: data.y,
+			x: pos.x,
+			y: pos.y,
 			w: this._gridSize,
 			h: this._gridSize
 		});
