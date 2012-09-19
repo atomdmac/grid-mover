@@ -55,6 +55,7 @@ Crafty.c("GridMover", {
 					};
 					break;
 				default:
+					console.log("Well, this is weird... Not a valid direction: ", this._direction);
 					break;
 			}
 			
