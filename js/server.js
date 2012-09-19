@@ -12,8 +12,6 @@ var connections = [];
 wss.on('connection', function (ws) {
 	
 	// Tell new player about existing movable items.
-	/*
-	
 	var movers = [];
 	for (var i=0; i<connections.length; i++) {
 		movers = movers.concat(connections[i].movers);
@@ -28,8 +26,6 @@ wss.on('connection', function (ws) {
 	}
 	console.log("Sending entire movers list: ", movers)
 	
-	*/
-	
     ws.on('message', function(message) {
         console.log('Received: %s', message);
 		
@@ -37,11 +33,9 @@ wss.on('connection', function (ws) {
 		var data = JSON.parse(message);
 		
 		// Store movers list so we can update players that join later.
-		/*
 		if (data.type == "announce_movers") {
-			ws.movers = JSON.parse(data.movers);
+			ws.movers = data.movers;
 		}
-		*/
 		
 		// Broadcast the message.
 		for (var i = 0; i<connections.length; i++) {
