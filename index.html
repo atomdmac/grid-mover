@@ -5,27 +5,52 @@
 	
 	<script src="../js/jquery.js"></script>
 	<script src="../js/crafty.js"></script>
+	<script src="js/utils.js"></script>
+	<script src="js/events.js"></script>
 	<script src="js/grid-display.js"></script>
 	<script src="js/grid-mover.js"></script>
+	<script src="js/client.js"></script>
+	<script src="js/player.js"></script>
+	<script src="js/remote-player.js"></script>
 	
 	<script>
 	$().ready( function (e) {
+	
+		// Config
+		var config = {
+			tileSize: 50,
+			server: {
+				url: "ws://192.168.0.146",
+				port: "8989"
+			}
+		}
 		
+		// Engine init.
 		Crafty.init(500, 500);
 		
+		// Create the networking components.
+		var websocket = Crafty.e("WebSocketClient");
+		
 		// Create the grid.
-		Crafty.e("GridDisplay").gridDisplay(50, 50);
+		Crafty.e("GridDisplay").gridDisplay(config.tileSize, config.tileSize);
+		
+		var newColor = Utils.getRandomColor();
+		console.log(newColor);
 		
 		// Create the local player.
-		var localPlayer = Crafty.e("2D, DOM, Color, GridMover")
-			.color("#00FF00")
+		var localPlayer = Crafty.e("2D, DOM, GridMover, LocalMover")
 			.attr({
-				x: 50,
-				y: 50,
-				w: 50,
-				h: 50
+				x: config.tileSize,
+				y: config.tileSize
 			})
-			.gridMover(50, 10);
+			.gridMover(config.tileSize, 10)
+			.localMover(newColor, websocket);
+			
+		// Keep the server updated with regards to localPlayer.
+		websocket.add(localPlayer);
+		
+		// Connect!
+		websocket.connect(config.server.url, config.server.port);
 		
 	});
 	</script>

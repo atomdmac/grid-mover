@@ -3,8 +3,8 @@
 // ----------------------------------------------------------------- //
 Crafty.c("GridMover", {
 	
-	// If a key is pressed, remember which one.
-	_curKey: null,
+	// A unique ID for this entity.
+	id: null,
 	
 	// The assumed size of each tile.  Affects how far our minimum 
 	// movement distance is.
@@ -16,23 +16,11 @@ Crafty.c("GridMover", {
 	// Are we moving between tiles currently?
 	_isMoving: false,
 	
-	// Fire when a key is pressed.
-	_keyDown: function (e) {
-		if (this._curKey == null) {
-			this._curKey = e.key;
-			this._move();
-		}
-	},
-	
-	// Fire when a key is released.
-	_keyUp: function (e) {
-		if (this._curKey == e.key) {
-			this._curKey = null;
-		}
-	},
+	// Current direction that we're moving.
+	_direction: null,
 	
 	// Move me!
-	_move: function () {
+	_move: function (bUseEvent) {
 		
 		if (!this._isMoving) {
 			// Well, we're going to move now.
@@ -44,48 +32,100 @@ Crafty.c("GridMover", {
 			// !!! DEBUG !!! //
 			console.log("Trying to move using key: ", this._curKey);
 			
-			if (this._curKey == Crafty.keys["LEFT_ARROW"]) {
-				animProps = {
-					x: this._x - this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["RIGHT_ARROW"]) {
-				animProps = {
-					x: this._x + this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["UP_ARROW"]) {
-				animProps = {
-					y: this._y - this._gridSize
-				};
-			}
-			
-			else if (this._curKey == Crafty.keys["DOWN_ARROW"]) {
-				animProps = {
-					y: this._y + this._gridSize
-				};
+			// Which direction to move?
+			switch (this._direction) {
+				case "LEFT":
+					animProps = {
+						x: this._x - this._gridSize
+					};
+					break;
+				case "RIGHT":
+					animProps = {
+						x: this._x + this._gridSize
+					};
+					break;
+				case "UP":
+					animProps = {
+						y: this._y - this._gridSize
+					};
+					break;
+				case "DOWN":
+					animProps = {
+						y: this._y + this._gridSize
+					};
+					break;
+				default:
+					break;
 			}
 			
 			// Go ahead and move 'er!
 			this.tween(animProps, this._moveDuration);
+			
+			// Let everyone know that we've moved 'er!
+			var currentCell = this._toCell({
+				x: this._x,
+				y: this._y
+			});
+			var destinationCell = this._toCell({
+				x: animProps.x != undefined ? animProps.x : this._x,
+				y: animProps.y != undefined ? animProps.y : this._y
+			});
+			var event = {
+				target: this,
+				current: currentCell,
+				destination: destinationCell,
+				direction: this._direction
+			};
+			
+			// Dispatch an event (if necessary).
+			if (bUseEvent) {
+				this.trigger("ChangeCellStart", event);
+			}
+		}
+	},
+	
+	// Convert a position to a tile/cell.
+	_toCell: function (pos) {
+		return {
+			x: Math.floor(pos.x / this._gridSize),
+			y: Math.floor(pos.y / this._gridSize)
+		}
+	},
+	
+	// Convert a tile/cell position to screen coords.
+	_toCoords: function (pos) {
+		return {
+			x: pos.x * this._gridSize,
+			y: pos.y * this._gridSize
 		}
 	},
 	
 	// Fire when I've moved 1 whole tile.
 	_onTileArrive: function (e) {
 		this._isMoving = false;
-		if (this._curKey != null) {
-			this._move();
+		
+		// Tell everyone about it!
+		var currentPos = this._toCell({
+			x: this._x,
+			y: this._y
+		});
+		var event = {
+			target: this,
+			current: currentPos
+		}
+		this.trigger("ChangeCellEnd", event);
+		
+		// Keep moving?
+		if (this._direction != null) {
+			this._move(this._direction);
 		}
 	},
 	
 	// Initialize with arguments.
 	gridMover: function (size, moveDuration) {
 		this.attr({
-			x: size,
-			y: size
+			w: size,
+			h: size
 		});
 		this._gridSize = size;
 		this._moveDuration = moveDuration;
@@ -94,15 +134,12 @@ Crafty.c("GridMover", {
 		var self = this;
 		
 		// Assign event handlers.
-		this.bind("KeyDown", function (e) { 
-			self._keyDown.call(self, e) 
-		});
-		this.bind("KeyUp", function (e) { 
-			self._keyUp.call(self, e) 
-		});
 		this.bind("TweenEnd", function (e) {
 			self._onTileArrive.call(self, e) 
 		});
+		
+		// For chaining.
+		return this;
 	},
 	
 	// Pre-init stuff.
