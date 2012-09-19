@@ -67,7 +67,7 @@ Crafty.c("LocalMover", {
 		
 		// Tell the server that I'm no longer moving.
 		var arriveEvent = {
-			type: Event.MOVE,
+			type: Event.ARRIVE,
 			id: this.id,
 			current: e.current
 		};
