@@ -15,7 +15,7 @@ Crafty.c("LocalMover", {
 		if (this._curKey == null) {
 			this._curKey = e.key;
 			this._direction = this._getDirection(e.key);
-			if (this._direction) this._move(true);
+			if (this._direction != null) this._move(true);
 		}
 	},
 	
@@ -41,7 +41,7 @@ Crafty.c("LocalMover", {
 				return "DOWN";
 			default:
 				console.log("Defaulting!");
-				return false;
+				return null;
 		}
 	},
 	
@@ -67,12 +67,14 @@ Crafty.c("LocalMover", {
 		console.log("ChangeCellEnd: ", e);
 		
 		// Tell the server that I'm no longer moving.
-		var arriveEvent = {
-			type: Event.ARRIVE,
-			id: this.id,
-			current: e.current
-		};
-		this._websocket.send(JSON.stringify(arriveEvent));
+		if (this._direction == null) {
+			var arriveEvent = {
+				type: Event.ARRIVE,
+				id: this.id,
+				current: e.current
+			};
+			this._websocket.send(JSON.stringify(arriveEvent));
+		}
 	},
 	
 	// Init with arguments.
