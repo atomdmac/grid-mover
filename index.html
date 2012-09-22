@@ -5,6 +5,7 @@
 	
 	<script src="../js/jquery.js"></script>
 	<script src="../js/crafty.js"></script>
+	<script src="js/cookie.js"></script>
 	<script src="js/utils.js"></script>
 	<script src="js/events.js"></script>
 	<script src="js/grid-display.js"></script>
@@ -48,6 +49,21 @@
 			
 		// Keep the server updated with regards to localPlayer.
 		websocket.add(localPlayer);
+		
+		// If the user hasn't given a name yet, ask for one.
+		var userName = cookie.get("userName");
+		if (userName == null) {
+			// Ask the user for a name.
+			userName = prompt("What's your name?");
+			
+			// Save for later user.
+			cookie.set({
+				"userName": userName
+			});
+		}
+		
+		// Update the websocket information.
+		websocket._player.name = userName;
 		
 		// Connect!
 		websocket.connect(config.server.url, config.server.port);
