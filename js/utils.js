@@ -38,3 +38,9 @@ Utils.padZeros = function ( number, width ) {
 	}
 	return number + ""; // always return a string
 }
+
+Utils.bindScope = function (scope, func) {
+	return function () {
+		func.apply(scope, arguments);
+	}
+}
