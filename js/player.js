@@ -91,8 +91,13 @@ Crafty.c("LocalMover", {
 		// Dependencies.
 		this.requires("2D, Color, DOM, GridMover");
 		
+		// Draw a square in the middle to show that this is a local mover.
+		this.css({
+			border: "1px solid red"
+		});
+		
 		// Initialize my ID.
-		this.id = new Date().getTime();
+		this.id = Utils.generateId();
 		
 		// Used for scoping.
 		var self = this;
