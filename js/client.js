@@ -2,24 +2,38 @@
  * Client-side Networking Code
  */
 Crafty.c("WebSocketClient", {
+	// Information about this player/client.
+	_player: {
+		// Unique identifier for this client.
+		id: "",
+		// The display name for this player/client.
+		name: ""
+	},
+	
 	// WebSocket Object.
 	_ws: null,
 	
+	/* 
+	 * ------------------------------------------------------------------------
+	 *  General Connection Events.
+	 * ------------------------------------------------------------------------
+	 */
+	
 	_onConnect: function (event) {
 		console.log("Connection Established: ", event);
-		// TODO
 		
-		// Announce local Movers to server.
-		var announceEvent = {
-			type: Event.ANNOUNCE_MOVERS,
-			movers: this._serializeLocalMovers()
-		};
-			
-		this._ws.send(JSON.stringify(announceEvent));
+		// Send join information.
+		var localMovers = this._serializeLocalMovers();
+		var joinEvent = {
+			type: Event.JOIN,
+			player: this._player,
+			movers: localMovers
+		}
+									
+		this._ws.send(JSON.stringify(joinEvent));
 	},
 	
 	_onMessage: function (event) {
-		// TODO
 		
 		// !!! DEBUG !!! //
 		console.log("Message Recieved: ", event);
@@ -28,22 +42,35 @@ Crafty.c("WebSocketClient", {
 		var data = JSON.parse(event.data);
 		
 		// Determine what kind of message this is:
-		// - Initial user/player list?
-		if (data.type == Event.ANNOUNCE_MOVERS) {
-			console.log(data);
-			this._initRemoteMovers(data.movers);
-		}
-		
 		// - User movement update (movement)?
-		else if (data.type == Event.MOVE) {
-			this._remoteMovers[data.id].updatePosition(data);
+		if (data.type == Event.MOVE) {
+			this._onRemoteMove(data);
 		}
 		
-		// - Request for interaction?
+		// - Initial user/player list from server.
+		if (data.type == Event.ANNOUNCE_MOVERS) {
+			this._onRemoteAnnounceMovers(data);
+		}
+		
+		// - A new player has joined the server.
+		else if (data.type == Event.JOIN) {
+			this._onRemoteJoin(data);
+		}
+		
+		// - An existing player has left the server.
+		else if (data.type == Event.LEAVE) {
+			this._onRemoteLeave(data);
+		}
+		
+		// - A player has requested an interaction with me.
 		else if (data.type == Event.INTERACT) {
 			// TODO
 		}
+		
 		// - ...etc.
+		else {
+			console.log("Unrecognized Network Event: ", data);
+		}
 	},
 	
 	_onError: function (event) {
@@ -53,6 +80,70 @@ Crafty.c("WebSocketClient", {
 	_onClose: function (event) {
 		console.log("Connection Closed!");
 	},
+	
+	/* 
+	 * ------------------------------------------------------------------------
+	 *  Remote Events.
+	 * ------------------------------------------------------------------------
+	 */
+	 
+	// A player/client joined.
+	_onRemoteJoin: function (data) {
+		console.log("Player '" + data.player + "' has joined.");
+		this._initRemoteMovers(data.movers);
+	},
+	
+	// A player/client left.
+	_onRemoteLeave: function (data) {
+		console.log("Player '" + data.player + "' has left.");
+		this._unInitRemoteMovers(data.movers);
+	},
+	
+	// Server announces current movers.
+	_onRemoteAnnounceMovers: function (data) {
+		this._initRemoteMovers(data.movers);
+	},
+	
+	// When a remote mover has changed position.
+	_onRemoteMove: function (data) {
+		this._remoteMovers[data.id].updatePosition(data);
+	},
+	
+	/**
+	 * Remote movers.
+	 */
+	_remoteMovers: null,
+	_initRemoteMovers: function (list) {
+		for (var a in list) {
+			this._addRemoteMover(list[a]);
+		}
+	},
+	
+	_unInitRemoteMovers: function (list) {
+		for (var a in list) {
+			this._removeRemoteMover(list[a]);
+		}
+	},
+	
+	_addRemoteMover: function (data) {
+		// Create a new RemoteMover component to represent the mover.
+		var mover = Crafty.e("RemoteMover").remoteMover(data);
+		
+		// Add it to the pile!
+		this._remoteMovers[mover.id] = mover;
+	},
+	
+	_removeRemoteMover: function (data) {
+		if (this._remoteMovers[data.id]) {
+			this._remoteMovers[data.id].destroy();
+		}
+	},
+	
+	/* 
+	 * ------------------------------------------------------------------------
+	 *  Local Events.
+	 * ------------------------------------------------------------------------
+	 */
 	
 	/**
 	 * Keep track of where this local mover object is.
@@ -91,26 +182,19 @@ Crafty.c("WebSocketClient", {
 		return list;
 	 },
 	
-	/**
-	 * Remote movers.
+	/* 
+	 * ------------------------------------------------------------------------
+	 *  Public Methods.
+	 * ------------------------------------------------------------------------
 	 */
-	_remoteMovers: null,
-	_initRemoteMovers: function (list) {
-		for (var a in list) {
-			var mover = Crafty.e("RemoteMover")
-				.remoteMover(list[a]);
-				
-			// Add it to the pile!
-			this._remoteMovers[mover.id] = mover;
-		}
-	},
-	_addRemoteMover: function (data) {
-		// TODO
-	},
-	_removeRemoteMover: function (id) {
-		// TODO
-	},
 	
+	/**
+	 * Connect to the server and assign callbacks to the resulting connection.
+	 *
+	 * @param url
+	 * @param port
+	 * @return Void
+	 */
 	connect: function (url, port) {
 		var self = this;
 		this._ws = new WebSocket(url + ":" + port);
@@ -130,10 +214,19 @@ Crafty.c("WebSocketClient", {
 		};
 	},
 	
+	/**
+	 * If a connection to the server is open, send a message to it.
+	 *
+	 * @param msg
+	 * @return Void
+	 */
 	send: function (msg) {
 		this._ws.send(msg);
 	},
 	
+	/**
+	 * Pre-initialization stuff.
+	 */
 	init: function () {
 		this._localMovers = {};
 		this._remoteMovers = {};
