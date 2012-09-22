@@ -13,11 +13,8 @@ Utils.getRandomColor = function () {
 /**
  * Generate a String to serve as a unique identifier.
  */
-Utils.generateId = function (idLength) {
-	if (!Utils.idSeed) Utils.idSeed = 0;
-	if (idLength == undefined) idLength = 10;
-	var rand = Utils.getRandomInt(0,99999999) + Utils.idSeed;
-	return 
+Utils.generateId = function () {
+	return new Date().getTime();
 }
 
 /**
