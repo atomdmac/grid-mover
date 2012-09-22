@@ -15,7 +15,7 @@ Crafty.c("LocalMover", {
 		if (this._curKey == null) {
 			this._curKey = e.key;
 			this._direction = this._getDirection(e.key);
-			this._move(true);
+			if (this._direction) this._move(true);
 		}
 	},
 	
@@ -40,7 +40,8 @@ Crafty.c("LocalMover", {
 			case Crafty.keys["DOWN_ARROW"]:
 				return "DOWN";
 			default:
-				break;
+				console.log("Defaulting!");
+				return false;
 		}
 	},
 	

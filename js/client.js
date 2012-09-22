@@ -76,10 +76,14 @@ Crafty.c("WebSocketClient", {
 		var list = [];
 		for (var a in this._localMovers) {
 			var cur = this._localMovers[a];
+			var pos = cur._toCell({
+				"x": cur.x,
+				"y": cur.y
+			});
 			list.push({
 				"id": cur.id,
-				"x": cur.x,
-				"y": cur.y,
+				"x": pos.x,
+				"y": pos.y,
 				"color": cur._color
 			});
 		}
