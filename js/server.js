@@ -71,10 +71,11 @@ function handleClientLeave (ws, data, code) {
 	};
 	var leaveEventString = JSON.stringify(leaveEvent);
 	
-	for(var i = 0; i<connections.length; i++) {
-		// Remove the connection that just disconnected.
+	for(var i=0; i<connections.length; i++) {
+		// Make a note of where the leaver connection is in our array so we can
+		// remove it when we're done alerting connected players.
 		if (connections[i] == ws) {
-			connections.splice(i, i+1);
+			var leaverIndex = Number(i);
 		}
 		
 		// If we're not dealing with the connection that just left,
@@ -83,6 +84,9 @@ function handleClientLeave (ws, data, code) {
 			connections[i].send(leaveEventString);
 		}
 	}
+	
+	// Remove the leaver connection.
+	connections.splice(leaverIndex, leaverIndex+1);
 }
 
 function broadcastMessage(ws, message) {
@@ -95,32 +99,6 @@ function broadcastMessage(ws, message) {
 }
 
 wss.on('connection', function (ws) {
-	
-	/*
-	// Tell new player about existing movable items.
-	// Create a complete list of all movers from all connections.
-	var allMovers = [];
-	for (var i=0; i<connections.length; i++) {
-		
-		var moverList = connections[i].movers;
-		for (var item in moverList) {
-			allMovers.push(moverList[item]);
-		}
-	}
-	
-	// !!! DEBUG !!! //
-	console.log("Sending entire movers list: ", allMovers)
-	
-	// If there's at least one mover here, tell everyone about it.
-	if (allMovers.length > 0) {
-		var announceEvent = {
-			"type"   : "announce_movers",
-			"movers" : allMovers,
-			"initial": "true"
-		};
-		ws.send(JSON.stringify(announceEvent));
-	}
-	*/
 	
 	// When the server recieves a message from this connection...
     ws.on('message', function(message) {
