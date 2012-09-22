@@ -48,7 +48,7 @@ Crafty.c("WebSocketClient", {
 		}
 		
 		// - Initial user/player list from server.
-		if (data.type == Event.ANNOUNCE_MOVERS) {
+		else if (data.type == Event.ANNOUNCE_MOVERS) {
 			this._onRemoteAnnounceMovers(data);
 		}
 		
@@ -163,7 +163,7 @@ Crafty.c("WebSocketClient", {
 	 * Create a version of the local mover's data that is suitable for passage
 	 * to the server.
 	 */
-	 _serializeLocalMovers: function () {
+	_serializeLocalMovers: function () {
 		var list = [];
 		for (var a in this._localMovers) {
 			var cur = this._localMovers[a];
@@ -172,15 +172,15 @@ Crafty.c("WebSocketClient", {
 				"y": cur.y
 			});
 			list.push({
+				"player": this._player,
 				"id": cur.id,
 				"x": pos.x,
 				"y": pos.y,
 				"color": cur._color
 			});
 		}
-		
 		return list;
-	 },
+	},
 	
 	/* 
 	 * ------------------------------------------------------------------------
