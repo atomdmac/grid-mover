@@ -67,9 +67,13 @@ function handleClientLeave (ws, data, code) {
 	}
 	var leaveEvent = {
 		type: "leave",
+		player: ws.player,
 		movers: leaveMovers
 	};
 	var leaveEventString = JSON.stringify(leaveEvent);
+	
+	// !!! DEBUG !!! //
+	console.log("Player Leaves: ", leaveEventString);
 	
 	for(var i=0; i<connections.length; i++) {
 		// Make a note of where the leaver connection is in our array so we can
