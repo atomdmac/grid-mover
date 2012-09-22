@@ -59,7 +59,7 @@ Crafty.c("LocalMover", {
 			destination: e.destination,
 			direction: this._direction
 		};
-		this._websocket.send(JSON.stringify(moveEvent));
+		this.trigger(Event.MOVE, moveEvent);
 	},
 	
 	_onChangeCellEnd: function (e) {
@@ -73,7 +73,7 @@ Crafty.c("LocalMover", {
 				id: this.id,
 				current: e.current
 			};
-			this._websocket.send(JSON.stringify(arriveEvent));
+			this.trigger(Event.ARRIVE, arriveEvent);
 		}
 	},
 	

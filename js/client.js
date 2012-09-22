@@ -30,7 +30,7 @@ Crafty.c("WebSocketClient", {
 			movers: localMovers
 		}
 									
-		this._ws.send(JSON.stringify(joinEvent));
+		this.send(joinEvent);
 	},
 	
 	_onMessage: function (event) {
@@ -89,13 +89,13 @@ Crafty.c("WebSocketClient", {
 	 
 	// A player/client joined.
 	_onRemoteJoin: function (data) {
-		console.log("Player '" + data.player + "' has joined.");
+		console.log("Player '", data.player, "' has joined.");
 		this._initRemoteMovers(data.movers);
 	},
 	
 	// A player/client left.
 	_onRemoteLeave: function (data) {
-		console.log("Player '" + data.player + "' has left.");
+		console.log("Player '", data.player, "' has left.");
 		this._unInitRemoteMovers(data.movers);
 	},
 	
@@ -145,13 +145,24 @@ Crafty.c("WebSocketClient", {
 	 * ------------------------------------------------------------------------
 	 */
 	
+	_onMove: function (event) {
+		this.send(event);
+	},
+	
+	_onArrive: function (event) {
+		this.send(event);
+	},
+	
 	/**
 	 * Keep track of where this local mover object is.
 	 */
 	_localMovers: null,
 	add: function (localMover) {
-		// TODO: Check to see if item was added previously so we don't get dups.
 		if (this._localMovers[localMover.id] == undefined) {
+			// Listen for events.
+			localMover.bind(Event.MOVE, Utils.bindScope(this, this._onMove));
+			localMover.bind(Event.ARRIVE, Utils.bindScope(this, this._onArrive));
+			
 			this._localMovers[localMover.id] = localMover;
 		}
 	},
@@ -217,11 +228,13 @@ Crafty.c("WebSocketClient", {
 	/**
 	 * If a connection to the server is open, send a message to it.
 	 *
-	 * @param msg
+	 * @param data
 	 * @return Void
 	 */
-	send: function (msg) {
-		this._ws.send(msg);
+	send: function (data) {
+		// Add additional information.
+		data.player = this._player;
+		this._ws.send(JSON.stringify(data));
 	},
 	
 	/**
