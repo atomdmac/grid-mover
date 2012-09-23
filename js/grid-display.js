@@ -2,39 +2,32 @@
 // Grid Display
 // ----------------------------------------------------------------- //
 Crafty.c("GridDisplay", {
-	gridDisplay: function (w, h) {
+	_tileW: 50,
+	_tileH: 50,
+	_drawGrid: function (size) {
 		var stage = $(Crafty.stage.elem);
 		var xtotal = stage.outerWidth();
 		var ytotal = stage.outerHeight();
-		
-		for(var x=0; x<xtotal; x+=w) {
-			for(var y=0; y<ytotal; y+=h) {
-				Crafty.e("GridDisplayCell").gridDisplayCell(x, y, w, h);
-			}
+		var xcells = xtotal / this._tileW;
+		var ycells = ytotal / this._tileH;
+		var ctx = this.ctx;
+		ctx.stokeStyle = "#000";
+		for (var x=0; x<xcells; x++) {
+			ctx.moveTo(x*this._tileW, 0);
+			ctx.lineTo(x*this._tileW, ytotal);
 		}
-			
+		for (var y=0; y<ycells; y++) {
+			ctx.moveTo(0, y*this._tileH);
+			ctx.lineTo(xtotal, y*this._tileH);
+		}
+		ctx.stroke();
 	},
 	
-	init: function () {
-		// Grab dependencies.
-		this.requires("2D, DOM, HTML");
-		
-		// Define sub-component.
-		Crafty.c("GridDisplayCell", {
-			gridDisplayCell: function (x, y, w, h) {
-				this.attr({
-					"x": x,
-					"y": y,
-					"w": w,
-					"h": h
-				});
-				this.css({
-					"border": "1px solid black"
-				});
-			},
-			init: function () {
-				this.requires("2D, DOM, HTML, Color");
-			}
-		});
+	gridDisplay: function (w, h) {
+		this._tileW = w;
+		this._tileH = h;
+		this.requires("Canvas");
+		this.ctx = Crafty.canvas.context;
+		this._drawGrid();
 	}
 });
