@@ -16,34 +16,36 @@ Crafty.c("RemoteMover", {
 		
 		// Stop all current tweens on this.
 		// NOTE: This is a total hack.  See Tween in Crafty code for details.
-		this.stopAllTweens();
+		// this.stopAllTweens();
 		
 		// Player is still in motion.  Continue along general path.
-		if (data.direction) {
-			this._isMoving = false;
+		if (!this._isMoving) {
+			this._isMoving = true;
 			this._direction = data.direction;
 			this._move(this._toCoords(data.destination));
 		}
 		// Player has stopped moving.  Go to final destination.
 		else {
 			// Only tolerate 5 movement in advance.  If we lag out, we lag out.
-			if (this._path.length > 5) {
+			/*if (this._path.length > 5) {
 				this._path.splice(0, this._path.length);
-			}
+			}*/
 			
 			// Queue 'er up for movement.
 			this._path.push(this._toCoords(data.destination));
+			console.log("Current remote queue: ", this._path);
 		}
 	},
 	
 	// NOTE: We use position here, not direction.  GET IT?
 	_move: function (position) {
+		console.log("move.", this._numProps, this._step);
+		this.stopAllTweens();
 		this.tween(position, this._moveDuration);
 	},
 	
 	// Called when the _move() animation finishes.
 	_onTileArrive: function (e) {
-		this._isMoving = false;
 		
 		// Tell everyone about it!
 		var currentPos = this._toCell({
@@ -59,7 +61,10 @@ Crafty.c("RemoteMover", {
 		// Keep moving?
 		if (this._path.length > 0) {
 			var next = this._path.pop();
+			console.log("Looping on to ", next);
 			this._move(next);
+		} else {
+			this._isMoving = false;
 		}
 	},
 	
