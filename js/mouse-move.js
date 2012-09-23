@@ -10,11 +10,15 @@ Crafty.c("MouseMover", {
 	},
 	
 	_getHeading: function (e) {
+	
 		// Calculate different.
 		var diff = {
-			x: e.clientX - this._downPos.x,
-			y: e.clientY - this._downPos.y
+			x: e.pageX - this._downPos.x,
+			y: e.pageY - this._downPos.y
 		}
+		console.log("down = ", this._downPos);
+		console.log("e = ", e);
+		console.log("diff = ", diff);
 		var abs = {
 			x: Math.abs(diff.x),
 			y: Math.abs(diff.y)
@@ -49,12 +53,10 @@ Crafty.c("MouseMover", {
 	 * Handle touch/mouse down.
 	 */
 	_onDown: function (e) {
-		console.log("on down", e);
-		
 		if (this._direction == null) {
 			// Remember where we clicked/touched first.
-			this._downPos.x = e.offsetX;
-			this._downPos.y = e.offsetY;
+			this._downPos.x = e.pageX;
+			this._downPos.y = e.pageY;
 			this._direction = this._getHeading(e);
 			Crafty.addEvent(this, Crafty.stage.elem, "mousemove", this._onMove);
 		}
@@ -70,8 +72,6 @@ Crafty.c("MouseMover", {
 	 * Handle touch/mouse release.
 	 */
 	_onRelease: function (e) {
-		// TODO
-		console.log("on release", e, this);
 		this._direction = null;
 		Crafty.removeEvent(this, Crafty.stage.elem, "mousemove", this._onMove);
 	},
