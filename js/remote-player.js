@@ -17,10 +17,6 @@ Crafty.c("RemoteMover", {
 		// !!! DEBUG !!! //
 		console.log("Remote Movement: ", data.direction);
 		
-		// Stop all current tweens on this.
-		// NOTE: This is a total hack.  See Tween in Crafty code for details.
-		// this.stopAllTweens();
-		
 		// Player is still in motion.  Continue along general path.
 		if (!this._isMoving) {
 			this._isMoving = true;
@@ -68,6 +64,20 @@ Crafty.c("RemoteMover", {
 		}
 	},
 	
+	/** 
+	 * Display the players name above them.
+	 */
+	_displayName: function (name) {
+		var nameTxt = Crafty.e("2D, DOM, Text")
+						.attr({
+							x: this.x,
+							y: this.y - 20,
+							w: 200
+						})
+						.text(name);
+		this.attach(nameTxt);
+	},
+	
 	// Initialize with parameters.
 	remoteMover: function (data) {
 		
@@ -91,6 +101,7 @@ Crafty.c("RemoteMover", {
 			h: this._gridSize
 		});
 		this.color(data.color);
+		this._displayName(data.player.name);
 		
 		// Used for scoping.
 		var self = this;
