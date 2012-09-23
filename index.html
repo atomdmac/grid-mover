@@ -8,6 +8,7 @@
 	<script src="js/cookie.js"></script>
 	<script src="js/utils.js"></script>
 	<script src="js/events.js"></script>
+	<script src="js/tiled-level.js"></script>
 	<script src="js/grid-display.js"></script>
 	<script src="js/grid-mover.js"></script>
 	<script src="js/client.js"></script>
@@ -30,6 +31,10 @@
 		// Engine init.
 		Crafty.init(300, 300);
 		
+		// Load and initialize the map.
+		var map = Crafty.e("TiledLevel")
+					.tiledLevel("data/maps/map.json", "Canvas");
+		
 		// Create the networking components.
 		var websocket = Crafty.e("WebSocketClient");
 		
@@ -47,6 +52,9 @@
 			.gridMover(config.tileSize, 10)
 			.localMover(newColor, websocket);
 			
+		// Hery viewport: Follow the player.
+		Crafty.viewport.follow(localPlayer);
+		
 		// Keep the server updated with regards to localPlayer.
 		websocket.add(localPlayer);
 		
@@ -67,6 +75,7 @@
 		
 		// Connect!
 		websocket.connect(config.server.url, config.server.port);
+		
 		
 	});
 	</script>
