@@ -9,6 +9,9 @@ Crafty.c("RemoteMover", {
 	// Path to follow.
 	_path: null,
 	
+	// Maximum amount of steps to keep in _path.
+	_maxPath: 5,
+	
 	// Update position based on new info from server.
 	updatePosition: function (data) {
 		// !!! DEBUG !!! //
@@ -27,19 +30,17 @@ Crafty.c("RemoteMover", {
 		// Player has stopped moving.  Go to final destination.
 		else {
 			// Only tolerate 5 movement in advance.  If we lag out, we lag out.
-			/*if (this._path.length > 5) {
-				this._path.splice(0, this._path.length);
-			}*/
+			if (this._path.length == this._maxPath) {
+				this._path.shift();
+			}
 			
 			// Queue 'er up for movement.
 			this._path.push(this._toCoords(data.destination));
-			console.log("Current remote queue: ", this._path);
 		}
 	},
 	
 	// NOTE: We use position here, not direction.  GET IT?
 	_move: function (position) {
-		console.log("move.", this._numProps, this._step);
 		this.stopAllTweens();
 		this.tween(position, this._moveDuration);
 	},
@@ -61,7 +62,6 @@ Crafty.c("RemoteMover", {
 		// Keep moving?
 		if (this._path.length > 0) {
 			var next = this._path.shift();
-			console.log("Looping on to ", next);
 			this._move(next);
 		} else {
 			this._isMoving = false;
