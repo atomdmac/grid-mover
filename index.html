@@ -13,13 +13,14 @@
 	<script src="js/client.js"></script>
 	<script src="js/player.js"></script>
 	<script src="js/remote-player.js"></script>
+	<script src="js/mouse-move.js"></script>
 	
 	<script>
 	$().ready( function (e) {
 	
 		// Config
 		var config = {
-			tileSize: 50,
+			tileSize: 25,
 			server: {
 				url: "ws://192.168.0.146",
 				port: "8989"
@@ -27,7 +28,7 @@
 		}
 		
 		// Engine init.
-		Crafty.init(500, 500);
+		Crafty.init(300, 300);
 		
 		// Create the networking components.
 		var websocket = Crafty.e("WebSocketClient");
@@ -36,10 +37,9 @@
 		Crafty.e("GridDisplay").gridDisplay(config.tileSize, config.tileSize);
 		
 		var newColor = Utils.getRandomColor();
-		console.log(newColor);
 		
 		// Create the local player.
-		var localPlayer = Crafty.e("2D, DOM, GridMover, LocalMover")
+		var localPlayer = Crafty.e("2D, DOM, GridMover, LocalMover, MouseMover")
 			.attr({
 				x: config.tileSize,
 				y: config.tileSize
