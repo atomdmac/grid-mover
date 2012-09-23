@@ -60,7 +60,7 @@ Crafty.c("RemoteMover", {
 		
 		// Keep moving?
 		if (this._path.length > 0) {
-			var next = this._path.pop();
+			var next = this._path.shift();
 			console.log("Looping on to ", next);
 			this._move(next);
 		} else {
