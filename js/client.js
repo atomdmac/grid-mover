@@ -89,13 +89,13 @@ Crafty.c("WebSocketClient", {
 	 
 	// A player/client joined.
 	_onRemoteJoin: function (data) {
-		console.log("Player '", data.player, "' has joined.");
+		console.log("Player '", data.player.name, "' has joined.");
 		this._initRemoteMovers(data.movers);
 	},
 	
 	// A player/client left.
 	_onRemoteLeave: function (data) {
-		console.log("Player '", data.player, "' has left.");
+		console.log("Player '", data.player.name, "' has left.");
 		this._unInitRemoteMovers(data.movers);
 	},
 	
