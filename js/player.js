@@ -10,11 +10,22 @@ Crafty.c("LocalMover", {
 	// If a key is pressed, remember which one.
 	_curKey: null,
 	
+	_checkCollision: function (x, y) {
+		
+		// var wouldHit = this._hitBox.hit("Solid");
+		var wouldHit = this.hit("Solid");
+		console.log("mbr = ", this.mbr());
+		console.log("would hit = ", wouldHit);
+		
+		return wouldHit;
+	},
+	
 	// Fire when a key is pressed.
 	_keyDown: function (e) {
 		if (this._curKey == null) {
 			this._curKey = e.key;
 			this._direction = this._getDirection(e.key);
+			if (this._checkCollision()) return;
 			if (this._direction != null) this._move(true);
 		}
 	},

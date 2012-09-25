@@ -8,7 +8,8 @@ Crafty.c("GridMover", {
 	
 	// The assumed size of each tile.  Affects how far our minimum 
 	// movement distance is.
-	_gridSize: 50,
+	// TODO: Make GridMover _gridSize dynamic according to a global variable or something.
+	_gridSize: 32,
 	
 	// How long it takes us to move from our current position to our next.
 	_moveDuration: 10,
@@ -59,6 +60,21 @@ Crafty.c("GridMover", {
 					break;
 			}
 			
+			// Avoid collisions
+			var destinationCell = this._toCell({
+				x: animProps.x != undefined ? animProps.x : this._x,
+				y: animProps.y != undefined ? animProps.y : this._y
+			});
+			
+			// So unclean...
+			var colPos = {
+				x: animProps.x != undefined ? animProps.x : this._x,
+				y: animProps.y != undefined ? animProps.y : this._y,
+			}
+			if (this._checkCollision(colPos.x, colPos.y)){
+				return;
+			}
+			
 			// Go ahead and move 'er!
 			this.tween(animProps, this._moveDuration);
 			
@@ -66,10 +82,6 @@ Crafty.c("GridMover", {
 			var currentCell = this._toCell({
 				x: this._x,
 				y: this._y
-			});
-			var destinationCell = this._toCell({
-				x: animProps.x != undefined ? animProps.x : this._x,
-				y: animProps.y != undefined ? animProps.y : this._y
 			});
 			var event = {
 				target: this,
@@ -146,6 +158,12 @@ Crafty.c("GridMover", {
 	// Pre-init stuff.
 	init: function () {
 		// Include dependencies.
-		this.requires("2D, KeyBoard, Tween");
+		this.requires("2D, KeyBoard, Tween, Collision");
+		
+		// Init hit box.
+		// TODO: This feels gross...
+		//this._hitBox = Crafty.e("2D, Collision, Color, WiredHitBox")
+			//			.color("#fff")
+						this.collision([0, 0], [0, this._gridSize], [this._gridSize, this._gridSize], [this._gridSize, 0]);
 	}
 });

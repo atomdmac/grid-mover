@@ -21,7 +21,7 @@
 	
 		// Config
 		var config = {
-			tileSize: 25,
+			tileSize: 32,
 			server: {
 				url: "ws://192.168.0.146",
 				port: "8989"
@@ -30,11 +30,26 @@
 		
 		// Engine init.
 		Crafty.init(300, 300);
-		
+		Crafty.c("Collidable", {
+			init: function () {
+				this.requires("2D, Collision, WiredHitBox");
+				var poly = new Crafty.polygon(
+										[0, 0], 
+										[0, config.tileSize],
+										[config.tileSize, config.tileSize],
+										[config.tileSize, 0]);
+				
+				this.onHit("Solid", function () {
+					console.log("Thanks.");
+				});
+			}
+		});
 		// Load and initialize the map.
 		var map = Crafty.e("TiledLevel")
-					.tiledLevel("data/maps/map.json", "Canvas");
+					.tiledLevel("data/maps/map.json", "DOM", finishInit);
 		
+		function finishInit () {
+		console.log("snap");
 		// Create the networking components.
 		var websocket = Crafty.e("WebSocketClient");
 		
@@ -53,7 +68,7 @@
 			.localMover(newColor, websocket);
 			
 		// Hery viewport: Follow the player.
-		Crafty.viewport.follow(localPlayer);
+		// Crafty.viewport.follow(localPlayer);
 		
 		// Keep the server updated with regards to localPlayer.
 		websocket.add(localPlayer);
@@ -76,7 +91,7 @@
 		// Connect!
 		websocket.connect(config.server.url, config.server.port);
 		
-		
+		}
 	});
 	</script>
 </head>

@@ -57,6 +57,13 @@
             },
          "spacing":0,
          "tileheight":32,
+         "tileproperties":
+            {
+             "0":
+                {
+                 "components":"Solid"
+                }
+            },
          "tilewidth":32
         }],
  "tilewidth":32,
