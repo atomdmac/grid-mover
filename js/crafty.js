@@ -4808,10 +4808,12 @@ Crafty.extend({
             Crafty.DOM.window.init();
 
             //fullscreen if mobile or not specified
-            this.width = (!w || Crafty.mobile) ? Crafty.DOM.window.width : w;
-            this.height = (!h || Crafty.mobile) ? Crafty.DOM.window.height : h;
-
-            //check if stage exists
+           // this.width = (!w || Crafty.mobile) ? Crafty.DOM.window.width : w;
+           // this.height = (!h || Crafty.mobile) ? Crafty.DOM.window.height : h;
+			this.width  = w;
+			this.height = h;
+            
+			//check if stage exists
             var crstage = document.getElementById("cr-stage");
 
             /**@
