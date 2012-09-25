@@ -21,7 +21,7 @@
 	
 		// Config
 		var config = {
-			tileSize: 25,
+			tileSize: 32,
 			server: {
 				url: "ws://192.168.0.146",
 				port: "8989"
@@ -32,7 +32,7 @@
 		Crafty.init(300, 300);
 		
 		// Load an enormous image for the background.
-		var bg = Crafty.e("2D, DOM, Image").image("data/images/image.jpg", "no-repeat");
+		var bg = Crafty.e("2D, DOM, Image").image("data/images/map_32x32_30x30_compressed.png", "no-repeat");
 		console.log(bg);
 		
 		// Load and initialize the map.
