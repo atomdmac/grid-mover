@@ -8,7 +8,7 @@ Crafty.c("GridMover", {
 	
 	// The assumed size of each tile.  Affects how far our minimum 
 	// movement distance is.
-	_gridSize: 50,
+	_gridSize: 25,
 	
 	// How long it takes us to move from our current position to our next.
 	_moveDuration: 10,
